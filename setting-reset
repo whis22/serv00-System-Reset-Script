@@ -2,14 +2,14 @@
 
 del_website(){
     domains=$(devil www list|sed -e '/^$/d' -e '/Domain/d'|awk '$1 !~ /serv00.net/ {print $1}')
-    if [ -z $domains ]
+    if [ -z "$domains" ]
     then 
         echo "The website is empty!"
         return 0
     else
         for i in ${domains[@]}
         do 
-            if [ -z "~/domains/$i" ]
+            if [ ! -d "~/domains/$i" ]
             then
                 echo "The website directory is empty!"
                 return 0
@@ -28,7 +28,7 @@ del_website(){
 del_port(){
     ports=$(devil port list|sed -e '/^$/d' -e '/Port/d'|awk '{print $1}')
     ports_num=$(devil port list|sed -e '/^$/d' -e '/Port/d'|wc -l)
-    if [ "`devil port list|sed -e '/^$/d' -e '/Port/d'|awk '{print $1}'`" = "No" ]
+    if [ "$(devil port list|sed -e '/^$/d' -e '/Port/d'|awk '{print $1}')" = "No" ]
     then
         echo "The port is empty!"
         return 0
@@ -45,15 +45,15 @@ del_port(){
 # cert
 del_cert(){
     ssls=$(devil ssl www list | sed -e '/^$/d'|awk 'NR>5 {print $1}')
-    if [ $ssls = "No" ]
+    if [ "$ssls" = "No" ]
     then
         echo "The SSL certificate directory is empty!"
         return 0
     else
         for i in ${ssls[@]}
-	    do
-            devil ssl www del `devil ssl www list|sed -e '/^$/d'|awk 'NR>5 {print $6,$1}'`
-	    done
+        do
+            devil ssl www del $(devil ssl www list|sed -e '/^$/d'|awk 'NR>5 {print $6,$1}')
+        done
     fi    
 }
 
@@ -72,16 +72,19 @@ del_process(){
 echo -e "\033[41;36m[Caution]:\033[0m \033[31mThis script will delete all the settings of the SERV00 server, please execute carefully！！！\033[0m"
 read -n 1 -p "Please input your choice [y/n]: " answer
 case $answer in
-   Y|y) echo
+   Y|y) 
+        echo
         echo -e "Delete the domain name, website, port, certificate, website directory content, please later ..."
         del_process
         del_website
         del_cert
         del_port
         ;;
-   N|n) echo
+   N|n) 
+        echo
         echo "Aborted, please re-execute the script."
-        exit;;
+        exit
+        ;;
 esac
 echo -e "\033[35m[Info]:\033[0m  The script has ended ..."
 exit
