@@ -70,6 +70,7 @@ del_process(){
 }
 
 echo -e "Delete the domain name, website, port, certificate, website directory content, please later ..."
+
 del_process
 del_website
 del_cert
